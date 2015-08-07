@@ -133,12 +133,15 @@ class GzStreamGuzzle implements StreamInterface
         }
 
         hash_update($this->hashCtx, $string);
-        return $this->writeSize += $this->stream->write($string);
+        $size = $this->stream->write($string);
+        $this->writeSize += $size;
+        return $size;
     }
 
     public function getSize ()
     {
-        return $this->writeSize+$this->headerLen+$this->footerLen;
+        $stat = fstat(StreamWrapper::getResource($this->stream));
+        return $stat['size'];
     }
 
     public function close()
