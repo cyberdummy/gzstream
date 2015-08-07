@@ -1,0 +1,25 @@
+{
+    "name": "cyberdummy/gzstream",
+    "description": "Provide gzip file streams for guzzle and s3",
+    "require-dev": {
+        "phpunit/phpunit": "^4.7",
+        "mikey179/vfsStream": "~1.5",
+        "vlucas/phpdotenv": "~2.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tom Westcott",
+            "email": "tom.westcott@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/psr7": "^1.1",
+        "aws/aws-sdk-php": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cyberdummy\\GzStream\\": "src/"
+        }
+    }
+}
