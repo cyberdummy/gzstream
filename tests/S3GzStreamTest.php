@@ -1,6 +1,4 @@
 <?php
-use GuzzleHttp\Psr7;
-use Cyberdummy\GzStream\GzStreamGuzzle;
 use Cyberdummy\GzStream\GzS3Wrapper;
 
 class GzStreamS3Test extends \PHPUnit_Framework_TestCase
