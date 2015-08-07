@@ -40,7 +40,7 @@ $stream = fopen('s3gz://somebucket/somegzippedfile.txt.gz', 'r');
 $line = fgets($stream, 1024);
 
 # Stream a write
-$stream = fopen('s3gz://somebucket/somegzippedfile.txt.gz', 'r');
+$stream = fopen('s3gz://somebucket/somegzippedfile.txt.gz', 'w');
 fwrite($stream, "Something to compress");
 fclose($stream);
 ```
