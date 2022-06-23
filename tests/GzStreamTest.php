@@ -1,13 +1,14 @@
 <?php
-use GuzzleHttp\Psr7;
+
 use Cyberdummy\GzStream\GzStreamGuzzle;
+use GuzzleHttp\Psr7\Utils;
 
 class GzStreamGuzzleTest extends \PHPUnit_Framework_TestCase
 {
     public function testReadStream()
     {
         $content = gzencode('test');
-        $a = Psr7\stream_for($content);
+        $a = Utils::streamFor($content);
         $b = new GzStreamGuzzle($a);
         $this->assertEquals('test', (string) $b);
     }
@@ -16,7 +17,7 @@ class GzStreamGuzzleTest extends \PHPUnit_Framework_TestCase
     {
         $dest = __DIR__.'/writeTest.gz';
         $fh = fopen($dest, 'w');
-        $a = Psr7\stream_for($fh);
+        $a = Utils::streamFor($fh);
         $gzStream = new GzStreamGuzzle($a);
         $content = 'The quick brown fox jumps over the lazy dog';
         $gzStream->write($content);
@@ -33,7 +34,7 @@ class GzStreamGuzzleTest extends \PHPUnit_Framework_TestCase
     {
         $dest = __DIR__.'/closeTest.gz';
         $fh = fopen($dest, 'w');
-        $a = Psr7\stream_for($fh);
+        $a = Utils::streamFor($fh);
         $gzStream = new GzStreamGuzzle($a);
         $content = 'The quick brown fox jumps over the lazy dog';
         $gzStream->write($content);
