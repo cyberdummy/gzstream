@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "guzzlehttp/psr7": "^1.1",
+        "guzzlehttp/psr7": "^1.7|^2",
         "aws/aws-sdk-php": "^3.2"
     },
     "autoload": {
