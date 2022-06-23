@@ -23,7 +23,7 @@ class GzStreamS3Test extends \PHPUnit_Framework_TestCase
         $result = $this->s3Client->putObject(array(
             'Bucket' => getenv('AWS_S3_BUCKET'),
             'Key'    => 's3ReadTest.txt.gz',
-            'SourceFile' => 's3ReadTest.txt.gz',
+            'SourceFile' => __DIR__.'/s3ReadTest.txt.gz',
         ));
 
         $stream = fopen('s3gz://'.getenv('AWS_S3_BUCKET').'/s3ReadTest.txt.gz', 'r');

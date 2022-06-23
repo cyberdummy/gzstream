@@ -156,7 +156,7 @@ class GzStreamGuzzle implements StreamInterface
 
     private function writeFooter()
     {
-        if ($this->footerLen > 0) {
+        if ($this->footerLen > 0 || is_null($this->hashCtx)) {
             return;
         }
 

@@ -2,15 +2,16 @@
 
 use Cyberdummy\GzStream\GzStreamGuzzle;
 use GuzzleHttp\Psr7\Utils;
+use GuzzleHttp\Psr7\Stream;
 
 class GzStreamGuzzleTest extends \PHPUnit_Framework_TestCase
 {
     public function testReadStream()
     {
-        $content = gzencode('test');
-        $a = Utils::streamFor($content);
-        $b = new GzStreamGuzzle($a);
-        $this->assertEquals('test', (string) $b);
+        $file = __DIR__.'/readTest.gz';
+        $fh = fopen($file, 'r');
+        $b = new GzStreamGuzzle(new Stream($fh));
+        $this->assertEquals('The quick brown fox jumps over the lazy dog', (string) $b);
     }
 
     public function testWriteStream()
