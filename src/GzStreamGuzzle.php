@@ -1,39 +1,68 @@
 <?php
+
 namespace Cyberdummy\GzStream;
 
-use Psr\Http\Message\StreamInterface;
-use GuzzleHttp\Psr7\StreamDecoratorTrait;
 use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Psr7\StreamDecoratorTrait;
 use GuzzleHttp\Psr7\StreamWrapper;
+use Psr\Http\Message\StreamInterface;
+use RuntimeException;
+use HashContext;
 
 class GzStreamGuzzle implements StreamInterface
 {
     use StreamDecoratorTrait;
 
-    private $mode;
-    private $headerLen = 0;
-    private $footerLen = 0;
-    private $hashCtx;
-    private $writeSize = 0;
-    private $filter;
+    /**
+     * @var StreamInterface The PSR7 stream
+     */
+    private StreamInterface $stream;
+
+    /**
+     * @var string Which mode we are in read or write
+     */
+    private string $mode = 'w';
+
+    /**
+     * @var int The length of gzip header field on this file
+     */
+    private int $headerLen = 0;
+
+    /**
+     * @var int The length of the gzip footer
+     */
+    private int $footerLen = 0;
+
+    /**
+     * @var HashContext|null Checksum hash context
+     */
+    private ?HashContext $hashCtx = null;
+
+
+    /**
+     * @var int Number of bytes we have written to stream
+     */
+    private int $writeSize = 0;
+
+    /**
+     * @var resource|null zlib filter applied to stream
+     */
+    private $filter = null;
 
     public function __construct(StreamInterface $stream)
     {
         $this->stream = $stream;
 
-        if (!$stream->isWritable()) {
-            $this->mode = 'r';
-        } else {
-            $this->mode = 'w';
+        if ($stream->isWritable()) {
+            return;
         }
 
-        if ($this->mode == 'r') {
-            $this->offsetHeader();
-            // inflate stream filter
-            $resource = StreamWrapper::getResource($stream);
-            stream_filter_append($resource, 'zlib.inflate', STREAM_FILTER_READ);
-            $this->stream = new Stream($resource);
-        }
+        $this->mode = 'r';
+        $this->offsetHeader();
+        // inflate stream filter
+        $resource = StreamWrapper::getResource($stream);
+        stream_filter_append($resource, 'zlib.inflate', STREAM_FILTER_READ);
+        $this->stream = new Stream($resource);
     }
 
     public function read($length)
@@ -54,7 +83,7 @@ class GzStreamGuzzle implements StreamInterface
     public function seek($offset, $whence = SEEK_SET)
     {
         if ($whence !== SEEK_SET || $offset < 0) {
-            throw new \RuntimeException(sprintf(
+            throw new RuntimeException(sprintf(
                 'Cannot seek to offset % with whence %s',
                 $offset,
                 $whence
@@ -122,7 +151,7 @@ class GzStreamGuzzle implements StreamInterface
     public function write($string)
     {
         if (!$this->stream->isWritable()) {
-            throw new \RuntimeException('Cannot write to a non-writable stream');
+            throw new RuntimeException('Cannot write to a non-writable stream');
         }
 
         if ($this->headerLen == 0) {

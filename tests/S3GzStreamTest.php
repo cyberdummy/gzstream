@@ -1,11 +1,13 @@
 <?php
-use Cyberdummy\GzStream\GzS3Wrapper;
 
-class GzStreamS3Test extends \PHPUnit_Framework_TestCase
+use Cyberdummy\GzStream\GzS3Wrapper;
+use PHPUnit\Framework\TestCase;
+
+class S3GzStreamTest extends TestCase
 {
     private $s3Client;
 
-    public function setUp()
+    public function setUp(): void
     {
         $dotenv = new Dotenv\Dotenv(__DIR__);
         $dotenv->load();

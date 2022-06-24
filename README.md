@@ -8,13 +8,6 @@ Installation with Composer
 --------------------------
 
 ```shell
-curl -s http://getcomposer.org/installer | php
-php composer.phar require cyberdummy/gzstream
-```
-
-OR
-
-```shell
 composer require cyberdummy/gzstream
 ```
 
@@ -23,11 +16,15 @@ Usage
 
 Usage in guzzle, wrap the body stream in the new decorator.
 ```php
+use Cyberdummy\GzStream\GzStreamGuzzle;
+
 $newBodyStream = new GzStreamGuzzle($psr7BodyStream);
 ```
 
 Usage with S3 stream wrapper.
 ```php
+use Cyberdummy\GzStream\GzS3Wrapper;
+
 $s3Client = new Aws\S3\S3Client([
     'version'     => 'latest'
 ]);

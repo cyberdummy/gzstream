@@ -1,8 +1,10 @@
 <?php
+
 namespace Cyberdummy\GzStream;
 
 use Aws\S3\StreamWrapper;
 use Aws\S3\S3Client;
+use ReflectionClass;
 
 class GzS3Wrapper extends StreamWrapper
 {
@@ -11,16 +13,18 @@ class GzS3Wrapper extends StreamWrapper
 
     protected function alter()
     {
-        if ($this->altered == false) {
-            $reflector = new \ReflectionClass($this);
-            $parent = $reflector->getParentClass();
-            $name = $parent->getProperty('body');
-            $name->setAccessible(true);
-            $body = $name->getValue($this);
-            $name->setValue($this, new GzStreamGuzzle($body));
-            $this->bodyStream = $name->getValue($this);
-            $this->altered = true;
+        if ($this->altered !== false) {
+            return;
         }
+
+        $reflector = new ReflectionClass($this);
+        $parent = $reflector->getParentClass();
+        $name = $parent->getProperty('body');
+        $name->setAccessible(true);
+        $body = $name->getValue($this);
+        $name->setValue($this, new GzStreamGuzzle($body));
+        $this->bodyStream = $name->getValue($this);
+        $this->altered = true;
     }
 
     public function stream_read($count)

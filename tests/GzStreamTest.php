@@ -1,10 +1,11 @@
 <?php
 
 use Cyberdummy\GzStream\GzStreamGuzzle;
-use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\TestCase;
 
-class GzStreamGuzzleTest extends \PHPUnit_Framework_TestCase
+class GzStreamTest extends TestCase
 {
     public function testReadStream()
     {
@@ -39,5 +40,8 @@ class GzStreamGuzzleTest extends \PHPUnit_Framework_TestCase
         $gzStream = new GzStreamGuzzle($a);
         $content = 'The quick brown fox jumps over the lazy dog';
         $gzStream->write($content);
+        $gzStream->close();
+
+        $this->assertSame(strlen($content)+10+8+1, filesize($dest));
     }
 }
