@@ -3,7 +3,6 @@
 namespace Cyberdummy\GzStream;
 
 use Aws\S3\StreamWrapper;
-use Aws\S3\S3Client;
 use ReflectionClass;
 
 class GzS3Wrapper extends StreamWrapper

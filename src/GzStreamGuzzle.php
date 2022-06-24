@@ -9,6 +9,9 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use HashContext;
 
+/**
+ * Decorate a guzzle body stream to compress/uncompress gzip file data.
+ */
 class GzStreamGuzzle implements StreamInterface
 {
     use StreamDecoratorTrait;
@@ -100,19 +103,23 @@ class GzStreamGuzzle implements StreamInterface
         $this->stream->seek($offset);
     }
 
+    /**
+     * If we are reading a .gz file we need to skip over the header information
+     * https://datatracker.ietf.org/doc/html/rfc1952#page-4
+     */
     private function offsetHeader()
     {
         $header = $this->stream->read(10);
         $this->headerLen += 10;
-        $header = unpack("C10", $header);
+        $header = unpack('C10', $header);
         $flags  = $header[4];
 
         // FEXTRA
         if ($flags & 0x4) {
             $len = $this->stream->read(2);
-            $len = unpack("S", $len);
+            $len = unpack('S', $len);
             $this->stream->read($len[1]);
-            $this->headerLen += 2+$len[1];
+            $this->headerLen += 2 + $len[1];
         }
         // FNAME
         if ($flags & 0x8) {
@@ -129,6 +136,9 @@ class GzStreamGuzzle implements StreamInterface
         }
     }
 
+    /**
+     * Cycle the current stream until the next null char
+     */
     private function readToNull()
     {
         while (($chr = $this->stream->read(1)) !== false) {
@@ -142,10 +152,10 @@ class GzStreamGuzzle implements StreamInterface
     private function writeHeader()
     {
         // no filename or mtime
-        $header = "\x1F\x8B\x08\0".pack("V", 0)."\0\xFF";
+        $header = "\x1F\x8B\x08\0" . pack('V', 0) . "\0\xFF";
         $this->stream->write($header);
         $this->headerLen = 10;
-        $this->hashCtx = hash_init("crc32b");
+        $this->hashCtx = hash_init('crc32b');
     }
 
     public function write($string)
@@ -167,7 +177,7 @@ class GzStreamGuzzle implements StreamInterface
         return $size;
     }
 
-    public function getSize ()
+    public function getSize()
     {
         $stat = fstat(StreamWrapper::getResource($this->stream));
         return $stat['size'];
@@ -195,9 +205,9 @@ class GzStreamGuzzle implements StreamInterface
             stream_filter_remove($this->filter);
         }
         // need to reverse the hash_final string so it's little endian
-        $this->stream->write($crc[3].$crc[2].$crc[1].$crc[0]);
+        $this->stream->write($crc[3] . $crc[2] . $crc[1] . $crc[0]);
         // write the original uncompressed file size
-        $this->stream->write(pack("V", $this->writeSize));
+        $this->stream->write(pack('V', $this->writeSize));
         $this->footerLen = 8;
     }
 }
